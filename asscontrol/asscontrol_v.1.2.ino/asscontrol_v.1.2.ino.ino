@@ -1,103 +1,108 @@
 #include "OneButton.h"
-#define R1 4
-#define R2 5
-#define R3 6
-#define GND 9
-#define OpUp 10
-#define OpDown 11
+#define R1 4                                  //
+#define R2 5                                  //
+#define R3 6                                  //
+#define GND 9                                 //
+#define OpUp 10                               //
+#define OpDown 11                             //
 
-OneButton OpEncoder(12,true);
-OneButton button1(7,true);
-OneButton button2(8,true);
-String val="";
+OneButton OpEncoder(12,true);                 //
+OneButton button1(7,true);                    //
+OneButton button2(8,true);                    //
+String val="";                                //
+
 void setup() {
-  pinMode(R1, OUTPUT);
-  pinMode(R2, OUTPUT);
-  pinMode(R3, OUTPUT);
-  digitalWrite(R3, HIGH);
-  pinMode(OpUp,INPUT_PULLUP);
-  pinMode(OpDown,INPUT_PULLUP);
-  pinMode(GND, OUTPUT);
-  digitalWrite(GND, LOW);
-  digitalWrite(R3, HIGH);
-    Serial.begin(38400);
+  pinMode(R1, OUTPUT);                        //
+  pinMode(R2, OUTPUT);                        //
+  pinMode(R3, OUTPUT);                        //
+  digitalWrite(R3, HIGH);                     //
+  pinMode(OpUp,INPUT_PULLUP);                 //
+  pinMode(OpDown,INPUT_PULLUP);               //
+  pinMode(GND, OUTPUT);                       //
+  digitalWrite(GND, LOW);                     //
+  digitalWrite(R3, HIGH);                     //
+    Serial.begin(38400);                      //
   //Serial.println("Test!");
-  button1.attachClick(change_direction);
-  button2.attachClick(Start_move);
+  button1.attachClick(change_direction);      //
+  button2.attachClick(Start_move);            //
   
-  OpEncoder.attachClick(All_Distance);
+  OpEncoder.attachClick(All_Distance);        //
   }
-boolean up=0;
-boolean Stop=0;
-int Quant;
-boolean GetUp;
-boolean GetDown;
-boolean down=1;
-boolean set_go=0; 
-boolean down_set=0;
-void loop() {
+/*------------глобальные переменные-----------*/  
+boolean up=0;                                 //
+boolean Stop=0;                               //
+int Quant;                                    //
+boolean GetUp;                                //
+boolean GetDown;                              //
+boolean down=1;                               //
+boolean set_go=0;                             //
+boolean down_set=0;                           //
+/*--------------------------------------------*/
+void loop() { 
  
- button1.tick();                      //опрос кнопки смены направления
- button2.tick();                      //опрос кнопки стар/стоп
- GetUp=digitalRead(OpUp);             //читаем верхнюю оптопару
- GetDown=digitalRead(OpDown);         //читаем нижнюю оптопару
- OpEncoder.tick();                    //опрос енкодера
+ button1.tick();                              //опрос кнопки смены направления
+ button2.tick();                              //опрос кнопки стар/стоп
  
- if (GetUp==false)                    //условие если верхняя кнопка разомкнута 
+ GetUp=digitalRead(OpUp);                     //читаем верхнюю оптопару
+ GetDown=digitalRead(OpDown);                 //читаем нижнюю оптопару
+ OpEncoder.tick();                            //опрос енкодера
+ 
+ if (GetUp==false)                            //условие если верхняя кнопка разомкнута 
  {
-  digitalWrite(R1, HIGH);             //выставляем направление на вверх
+  digitalWrite(R1, HIGH);                     //выставляем направление на вверх
   digitalWrite(R2, HIGH);
-  digitalWrite(R3, LOW);              //идем вверх
+  digitalWrite(R3, LOW);                      //идем вверх
  }
  else
  {
-  digitalWrite(R1, LOW);              //выставляем направление на вниз
+  digitalWrite(R1, LOW);                      //выставляем направление на вниз
   digitalWrite(R2, LOW);
-  digitalWrite(R3, HIGH);             //стоп движение
+  digitalWrite(R3, HIGH);                     //стоп движение
  }
- 
- while (Auto_bit==1)                  //цикл по условию автоматического режима отбора проб
+/*цикл по условию автоматического режима отбора проб*/
+ while (Auto_bit==1)                          //
  {
-   GetUp=digitalRead(OpUp);             //читаем верхнюю оптопару
-   GetDown=digitalRead(OpDown);         //читаем нижнюю оптопару
-   OpEncoder.tick();                    //опрос енкодера
-   if(Stop==1)
+   GetUp=digitalRead(OpUp);                   //читаем верхнюю оптопару
+   GetDown=digitalRead(OpDown);               //читаем нижнюю оптопару
+   OpEncoder.tick();                          //опрос енкодера
+   if(Stop==1)                                //
    {
-    Start_move();
+    Start_move();                             //
    }
-   if(L==300&&down_set==true){
-    Start_move();
-    change_direction();
-    Start_move();
-    down_set=false;
+   if(L==300&&down_set==true){                //
+    Start_move();                             //
+    change_direction();                       //
+    Start_move();                             //
+    down_set=false;                           //
    }
-   if(GetUp==1)
+   if(GetUp==1)                               //
    {
-    Auto_bit=0;
+    Auto_bit=0;                               //
    }
  }
- 
- while(Serial.available()){
-  char c= Serial.read();
-  val+=c;
-  delay(3);
+ /*------цикл опроса блютуз команд------*/
+ while(Serial.available()){             //
+  char c= Serial.read();                //
+  val+=c;                               //
+  delay(3);                             //
+ }                              
+ if (val!=""){                          //
+  Serial.println(val);                  //
  }
- if (val!=""){
-  Serial.println(val);
+ if(val=="Run"){                        //
+  Start_move();                         //
  }
- if(val=="Run"){
-  Start_move();
+ if(val=="Switch"){                     //
+  change_direction();                   //
  }
- if(val=="Switch"){
-  change_direction();
+ if(val=="Auto"){                       //
+  Auto_Run();                           //
  }
- if(val=="Auto"){
-  Auto_Run();
- }
- val="";
+ val="";                                //
 }
+/*-------------------------------------*/
 
-
+/*-----функция смены направления движения-----*/
 void change_direction(){
 if (up==0)
 up=1; //up
@@ -114,7 +119,9 @@ case 1:
     break;
         }
 }
-    
+/*----------------------------------------------*/
+
+/*--------функция старт/стоп движения-----------*/   
 void Start_move(){
 if (Stop==0)
 Stop=1;
@@ -129,9 +136,9 @@ case 1:
     break;
     }
 }
+/*----------------------------------------------*/
 
-
-
+/*---------не сбывшиеся мечты  (-_-)--------------*/
 void Down_Distance(){
   Serial.println("Down_Distance");
 }
