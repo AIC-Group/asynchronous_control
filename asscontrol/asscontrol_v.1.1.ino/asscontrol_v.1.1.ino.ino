@@ -39,7 +39,11 @@ void loop() {
  GetUp=digitalRead(OpUp);
  GetDown=digitalRead(OpDown);
  OpEncoder.tick();
- 
+ //Serial.print("GetUp=");
+ //Serial.print(GetUp);
+ //Serial.print("   GetDown=");
+ //Serial.println(GetDown);
+Serial.println(k);
  while(Serial.available()){
   char c= Serial.read();
   val+=c;
@@ -97,6 +101,6 @@ void Down_Distance(){
 
 void All_Distance(){
    k++;
-  Serial.println(k);
+  
 }
 
